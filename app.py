@@ -1,88 +1,125 @@
 import streamlit as st
+from agents.planner_agent import create_plan
 from agents.research_agent import ask_llm
 from tools.web_search import search_web
 
-# ---------------- PAGE CONFIG ---------------- #
+
+# ---------------- CONFIG ---------------- #
 
 st.set_page_config(
-    page_title="Autonomous AI Research Agent",
+    page_title="Deep Research Agent",
     page_icon="🧠",
     layout="wide"
 )
 
+
 # ---------------- SIDEBAR ---------------- #
 
 with st.sidebar:
-    st.title("🧠 AI Research Agent")
+
+    st.title("🧠 Deep Research Agent")
 
     st.markdown("""
-    **Capabilities**
-    ✅ Autonomous research  
-    ✅ Web search  
-    ✅ Local LLM reasoning  
-    ✅ Structured summaries  
-    """)
+### ⚡ Agent Capabilities
+- Autonomous planning  
+- Multi-source research  
+- Local LLM reasoning  
+- Structured report generation  
+""")
 
     st.divider()
 
-    st.info("Built using Local LLM + Tools.\nZero API cost.")
+    st.success("✅ Running Fully Local\nNo API Costs")
+
+    st.divider()
+
+    st.markdown("Built for serious research workflows.")
+
 
 # ---------------- HEADER ---------------- #
 
-st.title("🚀 Autonomous AI Research Agent")
+st.title("🚀 Deep Autonomous Research Agent")
 
 st.markdown("""
-Ask any research question and the agent will:
+Ask a complex research question.
 
-1️⃣ Search the web  
-2️⃣ Analyze sources  
-3️⃣ Generate a structured research summary  
+The agent will:
+
+🧠 Plan the research  
+🔎 Search the web  
+📚 Analyze sources  
+✍️ Generate a structured report  
 """)
 
 st.divider()
 
+
 # ---------------- INPUT ---------------- #
 
 query = st.text_input(
-    "🔍 Enter your research topic:",
-    placeholder="Example: How does the body digest protein?"
+    "Enter a research topic:",
+    placeholder="Example: Biological mechanisms of protein digestion"
 )
 
-# ---------------- RUN BUTTON ---------------- #
 
-if st.button("Run Research", use_container_width=True):
+# ---------------- RUN ---------------- #
 
-    if query:
+if st.button("Run Autonomous Research", use_container_width=True):
 
-        with st.spinner("🧠 Agent is researching... please wait"):
-
-            results = search_web(query)
-
-            sources = "\n".join([r["title"] for r in results])
-
-            prompt = f"""
-            Conduct deep research on:
-
-            {query}
-
-            Use the following sources:
-            {sources}
-
-            Provide a structured research summary.
-            """
-
-            response = ask_llm(prompt)
-
-        # ---------- OUTPUT ---------- #
-
-        st.success("Research Complete!")
-
-        st.subheader("📚 Research Summary")
-        st.write(response)
-
-        with st.expander("🔎 Sources"):
-            for r in results:
-                st.markdown(f"- [{r['title']}]({r['url']})")
-
-    else:
+    if not query:
         st.warning("Please enter a research topic.")
+        st.stop()
+
+    # -------- STEP 1: PLAN -------- #
+
+    with st.spinner("🧠 Creating research plan..."):
+        plan = create_plan(query)
+
+    st.subheader("🧠 Research Plan")
+    st.info(plan)
+
+    # -------- STEP 2: SEARCH -------- #
+
+    with st.spinner("🔎 Searching academic sources..."):
+        results = search_web(query)
+
+    st.subheader("📚 Sources Identified")
+
+    for r in results[:5]:
+        st.markdown(f"- [{r['title']}]({r['url']})")
+
+    # -------- STEP 3: REPORT -------- #
+
+    with st.spinner("✍️ Writing research report..."):
+
+        sources = "\n".join([r["title"] for r in results])
+
+        prompt = f"""
+        You are an expert research analyst.
+
+        Follow this research plan:
+
+        {plan}
+
+        Topic:
+        {query}
+
+        Sources:
+        {sources}
+
+        Write a HIGH-quality research report with:
+
+        - Executive Summary
+        - Key Concepts
+        - Scientific Foundations
+        - Recent Advancements
+        - Challenges
+        - Future Directions
+        """
+
+        report = ask_llm(prompt)
+
+    st.success("✅ Research Complete")
+
+    st.subheader("📄 Final Research Report")
+    st.write(report)
