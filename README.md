@@ -32,11 +32,8 @@ The architecture mirrors production-grade agent systems.
 
 ## 🧠 Agent Architecture
 
-
-
-
-
-
+<img width="810" height="567" alt="Image" src="https://github.com/user-attachments/assets/cce212a3-bb01-4c08-9335-0e9fcdc6eb8c" />
+---
 
 This modular design enables scalability and future enhancements such as:
 
