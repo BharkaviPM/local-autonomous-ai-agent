@@ -1,0 +1,4 @@
+ddgs
+tavily-python
+streamlit
+ollama
